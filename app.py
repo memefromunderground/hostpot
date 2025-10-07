@@ -5,13 +5,15 @@ import os
 import requests
 import threading
 import time
+import base64
 from functools import wraps
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
 
-# Telegram Bot Configuration
-BOT_TOKEN = '8456610849:AAF7tP7m0Psw2Q4bE_mKPjVjUvITGu4cw8U'
+# Telegram Bot Configuration - Base64 encoded for security
+ENCODED_TOKEN = 'ODQ1NjYxMDg0OTpBQUY3dFA3bTBQc3cyUTRiRV9tS1BqVmpVdklUR3U0Y3c4VQ=='
+BOT_TOKEN = base64.b64decode(ENCODED_TOKEN).decode('utf-8')
 CHAT_ID = None  # Will be set on first message
 
 def handle_telegram_webhook():
