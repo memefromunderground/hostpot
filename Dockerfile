@@ -19,7 +19,7 @@ COPY . .
 # Set environment variables
 ENV FLASK_APP=app.py
 ENV FLASK_ENV=production
-ENV DATABASE_PATH=/app/data/phishing_data.db
+
 
 # Expose port 5000
 EXPOSE 5000
