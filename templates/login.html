@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log into Facebook</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            max-width: 400px;
+            width: 100%;
+        }
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #1877f2;
+            font-size: 42px;
+            font-weight: bold;
+        }
+        .login-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #dddfe2;
+            border-radius: 6px;
+            font-size: 17px;
+            background: #f5f6f7;
+        }
+        input:focus {
+            outline: none;
+            border-color: #1877f2;
+        }
+        .login-btn {
+            background: #1877f2;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 20px;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        .login-btn:hover {
+            background: #166fe5;
+        }
+        .links {
+            text-align: center;
+            margin: 15px 0;
+        }
+        .links a {
+            color: #1877f2;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .divider {
+            border-bottom: 1px solid #dadde1;
+            margin: 20px 0;
+        }
+        .create-account {
+            background: #42b72a;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 17px;
+            font-weight: bold;
+            width: 100%;
+            cursor: pointer;
+        }
+        .footer {
+            text-align: center;
+            font-size: 14px;
+            color: #737373;
+            margin-top: 20px;
+        }
+        .error-message {
+            color: #ff0000;
+            font-size: 12px;
+            margin-top: 5px;
+            min-height: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">facebook</div>
+        
+        <div class="login-box">
+            <form method="POST" onsubmit="return validateForm()">
+                <div class="form-group">
+                    <input type="text" id="email" name="email" placeholder="Email or phone number">
+                    <div id="emailError" class="error-message"></div>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="password" name="pass" placeholder="Password">
+                    <div id="passwordError" class="error-message"></div>
+                </div>
+                <button type="submit" class="login-btn">Log In</button>
+            </form>
+            
+            <div class="links">
+                <a href="#">Forgotten password?</a>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <button class="create-account">Create New Account</button>
+        </div>
+        
+        <div class="footer">
+            <div style="margin-bottom: 10px;">
+                <a href="#" style="color: #385898; margin: 0 5px;">English (UK)</a>
+                <a href="#" style="color: #385898; margin: 0 5px;">More languages</a>
+            </div>
+            Meta © 2024
+        </div>
+    </div>
+     <script>
+        function validateForm() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            // Clear previous errors
+            document.getElementById('emailError').textContent = '';
+            document.getElementById('passwordError').textContent = '';
+            
+            let isValid = true;
+            
+            // Email/phone validation
+            if (!email) {
+                document.getElementById('emailError').textContent = 'Email or phone is required';
+                isValid = false;
+            } else if (/^\d+$/.test(email)) {
+                // Phone number - check if at least 11 digits
+                if (email.length < 11) {
+                    document.getElementById('emailError').textContent = 'Phone number must be at least 11 digits';
+                    isValid = false;
+                }
+            } else if (email.includes('@')) {
+                // Email validation - check basic format
+                if (!email.includes('.') || email.indexOf('@') === 0) {
+                    document.getElementById('emailError').textContent = 'Please enter a valid email address';
+                    isValid = false;
+                }
+            } else {
+                document.getElementById('emailError').textContent = 'Please enter valid email or phone';
+                isValid = false;
+            }
+            
+            // Password validation
+            if (!password) {
+                document.getElementById('passwordError').textContent = 'Password is required';
+                isValid = false;
+            }
+            
+            return isValid;
+        }
+    </script>
+</body>
+
+</html>
