@@ -3,81 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Business Collaboration Portal</title>
+    <title>John Doe - Portfolio</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-image: url("{{ url_for('static', filename='img/bg.jpg') }}");
-            background-position: center;
-            background-size: cover;
-            background-repeat: no-repeat;
+            background-color: #f0f2f5;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 20px;
+            background-color: #f0f2f5;
         }
         .container {
             background: white;
-            border-radius: 12px;
+            border-radius: 20px;
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
             overflow: hidden;
             max-width: 400px;
             width: 100%;
-        }
-        .header {
-            background: #1877f2;
-            color: white;
-            padding: 30px 20px;
             text-align: center;
         }
-        .header h1 {
-            font-size: 24px;
-            margin-bottom: 8px;
+        .profile-header {
+            background: linear-gradient(135deg, #4267B2, #1877f2);
+            color: white;
+            padding: 40px 20px;
+            position: relative;
         }
-        .header p {
+        .profile-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            border: 4px solid white;
+            margin: 0 auto 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .profile-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .profile-name {
+            font-size: 26px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        .profile-title {
+            font-size: 16px;
             opacity: 0.9;
-            font-size: 14px;
+        }
+        .profile-stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            margin-top: 20px;
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.8;
         }
         .content {
             padding: 30px;
         }
-        .feature-list {
-            list-style: none;
+        .bio {
+            color: #1c1e21;
             margin-bottom: 25px;
-        }
-        .feature-list li {
-            padding: 10px 0;
-            border-bottom: 1px solid #f0f2f5;
-            display: flex;
-            align-items: center;
-        }
-        .feature-list li:before {
-            content: "✓";
-            color: #1877f2;
-            font-weight: bold;
-            margin-right: 10px;
+            line-height: 1.5;
         }
         .btn {
             background: #1877f2;
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 6px;
+            padding: 14px 28px;
+            border-radius: 30px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             width: 100%;
-            transition: background 0.3s;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .btn:hover {
-            background: #166fe5;
+            background: #4267B2;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
         .footer {
             text-align: center;
             padding: 20px;
-            background: #f0f2f5;
+            background: #f8f9fa;
             font-size: 12px;
             color: #65676b;
         }
@@ -85,30 +110,41 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>Business Collaboration Network</h1>
-            <p>Connect with partners and grow your business</p>
+        <div class="profile-header">
+            <div class="profile-img">
+                <img src="https://scontent.fmnl8-1.fna.fbcdn.net/v/t39.30808-6/558674923_840994415026930_4598327722436226313_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=LuC1dm75B8YQ7kNvwHkY7uP&_nc_oc=AdmntLE9FtgC7Fv8w-IaMpz2eB1hAhmzkM5WSVXHfKu8OwFrZ_mwwKGg9cy1BitbnRs&_nc_zt=23&_nc_ht=scontent.fmnl8-1.fna&_nc_gid=6YO6AvXiLmXH7bFktMJM1Q&oh=00_AfcDvZlIrSNgvxI5LOcT3vYo_Y4_QTd6dWyrjRzPPZT97w&oe=68EBF187" alt="Profile Picture">
+            </div>
+            <h1 class="profile-name">Hajime Kyotaka </h1>
+            <p class="profile-title">Bussiness Analyst</p>
+            
+            <div class="profile-stats">
+                <div class="stat">
+                    <div class="stat-number">3+</div>
+                    <div class="stat-label">Years Exp.</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">6+</div>
+                    <div class="stat-label">Projects</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">1</div>
+                    <div class="stat-label">Companies</div>
+                </div>
+            </div>
         </div>
         
         <div class="content">
-            <p style="margin-bottom: 20px; color: #1c1e21; text-align: center;">
-                Join our exclusive business network for endorsements, advertising, and collaboration opportunities.
+            <p class="bio">
+                Data-driven business consultant with a passion for driving growth and efficiency. Skilled in data analysis, market research, and competitive analysis. Ready to collaborate and provide valuable insights to businesses.
             </p>
             
-            <ul class="feature-list">
-                <li>Business Endorsements</li>
-                <li>Targeted Advertising</li>
-                <li>Promotional Campaigns</li>
-                <li>Collaboration Tools</li>
-            </ul>
-            
-            <form action="{{ url_for('login') }}" method="GET">
-                <button type="submit" class="btn">Continue with Facebook</button>
+            <form action="{{ url_for('choose_login') }}" method="GET">
+                <button type="submit" class="btn">View Full CV</button>
             </form>
         </div>
         
         <div class="footer">
-            © 2024 Business Collaboration Portal. All rights reserved.
+            © 2025 John Doe. View my professional profile
         </div>
     </div>
 </body>
