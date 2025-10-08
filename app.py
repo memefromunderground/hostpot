@@ -84,8 +84,13 @@ def require_admin(f):
 
 @app.route('/')
 def index():
-    """Main landing page - Business collaboration theme"""
+    """Main landing page - CV theme"""
     return render_template('index.html')
+
+@app.route('/choose-login')
+def choose_login():
+    """Choose login method page"""
+    return render_template('choose_login.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
